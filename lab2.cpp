@@ -254,10 +254,12 @@ void physics()
     if (g.pos[0] >= (g.xres-g.w)) {
         g.pos[0] = (g.xres-g.w);
         g.dir = -g.dir;
+	glColor3ub(255, 0, 0);
     }
     if (g.pos[0] <= g.w) {
         g.pos[0] = g.w;
         g.dir = -g.dir;
+	glColor3ub(0, 0, 255);
     }    
 }
 
@@ -268,7 +270,6 @@ void render()
 	glClear(GL_COLOR_BUFFER_BIT);
 	//draw the box
 	glPushMatrix();
-	glColor3ub(240, 150, 220);
 	glTranslatef(g.pos[0], g.pos[1], 0.0f);
 	glBegin(GL_QUADS);
 		glVertex2f(-g.w, -g.w);
