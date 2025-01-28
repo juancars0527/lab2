@@ -1,8 +1,8 @@
 // = { 0.0f+w, g.yres/2.0f };
     //clear the window
 
-//modified by:
-//date:
+//modified by: Juancarlos Sandoval
+//date: January 28 2025
 //
 //original author: Gordon Griesel
 //date:            2025
