@@ -1,6 +1,4 @@
-// = { 0.0f+w, g.yres/2.0f };
-    //clear the window
-
+//
 //modified by: Juancarlos Sandoval
 //date: January 28 2025
 //
@@ -11,6 +9,7 @@
 //This program needs some refactoring.
 //We will do this in class together.
 //
+// 1/31/2025 add some text
 //
 #include <iostream>
 using namespace std;
@@ -23,6 +22,7 @@ using namespace std;
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include "fonts.h"
 
 //some structures
 
@@ -85,6 +85,7 @@ int main()
 		x11.swapBuffers();
 		usleep(200);
 	}
+	cleanup_fonts();
 	return 0;
 }
 
@@ -128,7 +129,7 @@ void X11_wrapper::set_title()
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "3350 Lab-1");
+	XStoreName(dpy, win, "3350 Lab-2 - Esc to Exit ");
 }
 
 bool X11_wrapper::getXPending()
@@ -194,13 +195,21 @@ void X11_wrapper::check_mouse(XEvent *e)
 	}
 	if (e->type == ButtonPress) {
 		if (e->xbutton.button==1) {
-			//Left button was pressed.
+			//Left button was pressed. Slows down box.
 			//int y = g.yres - e->xbutton.y;
+			if (g.dir < 0)
+			    g.dir -= 5.0f;
+			else
+			    g.dir += 5.0f;
 			return;
 		}
 		if (e->xbutton.button==3) {
-			//Right button was pressed.
-			return;
+		    //Right button was pressed. Speeds up box.
+		    if (g.dir < 0)
+			g.dir += 10.0f;
+		    else
+			g.dir -= 10.0f;
+		    return;
 		}
 	}
 	if (e->type == MotionNotify) {
@@ -244,6 +253,10 @@ void init_opengl(void)
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+
+	//Do this to allow fonts
+	glEnable(GL_TEXTURE_2D);
+	initialize_fonts();
 }
 
 void physics()
@@ -252,23 +265,23 @@ void physics()
     g.pos[0] += g.dir;
     //Collision detection.
     if (g.pos[0] >= (g.xres-g.w)) {
-        g.pos[0] = (g.xres-g.w);
-        g.dir = -g.dir;
+	g.pos[0] = (g.xres-g.w);
+	g.dir = -g.dir;
 	glColor3ub(255, 0, 0);
-    }
+         }
     if (g.pos[0] <= g.w) {
-        g.pos[0] = g.w;
-        g.dir = -g.dir;
-	glColor3ub(0, 0, 255);
-    }    
+	g.pos[0] = g.w;
+	g.dir = -g.dir;
+	glColor3ub(0, 0, 255);}  
 }
 
 void render()
 {
 
+
 	//clear the window
 	glClear(GL_COLOR_BUFFER_BIT);
-	//draw the box
+	//draw the box	
 	glPushMatrix();
 	glTranslatef(g.pos[0], g.pos[1], 0.0f);
 	glBegin(GL_QUADS);
@@ -278,7 +291,16 @@ void render()
 		glVertex2f( g.w, -g.w);
 	glEnd();
 	glPopMatrix();
+	
+	Rect r;
 
+	r.bot = g.yres - 20;
+        r.left = 10;
+        r.center = 0;
+	
+        ggprint8b(&r, 16, 0x00ff0000, "3350 - BOX");
+        ggprint8b(&r, 16, 0x00ffff00, "ESC to exit");
+        ggprint8b(&r, 16, 0x00ffff00, "right/left mouse slow/speed up");
 }
 
 
